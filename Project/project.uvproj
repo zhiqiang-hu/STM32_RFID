@@ -176,7 +176,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -372,7 +372,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
+              <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\Libraries\STM32_USB-FS-Device_Driver\inc;.\CMSIS;.\HARDWARE;.\SYSTEM;.\USB_CONFIG;.\USER;.\IAP</IncludePath>
             </VariousControls>

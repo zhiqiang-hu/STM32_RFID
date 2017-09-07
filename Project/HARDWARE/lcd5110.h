@@ -25,7 +25,7 @@ void LCD5110_Init(void);
 void LCD_Send(u8 data, DCType dc);
 void LCD_Clear(void);
 void LCD_Write_EnStr(u8 X, u8 Y, u8* s);
-
+void LCD_Printf(u8 x,u8 y,const char *fmt,...);
 
 
 

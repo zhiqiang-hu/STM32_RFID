@@ -1,6 +1,8 @@
 #include "lcd5110.h"
 #include "spi.h"
 #include "delay.h"
+#include "stdio.h"
+#include "stdarg.h"
 
 static u8 lcd_buf[84*6];
 
@@ -127,7 +129,7 @@ void LCD_GPIO_Init(void)
 	//LCD_RST			--------> PB3
 	//LCD_CE			--------> PA15
 	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_3;
  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -142,7 +144,7 @@ void LCD_GPIO_Init(void)
 
 void LCD5110_Init(void)
 {
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 #if EN_SPI2_DMA
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1 , ENABLE);
 #endif
@@ -162,6 +164,7 @@ void LCD5110_Init(void)
 	LCD_Send(0x06, DC_CMD);	//温度校正
 	LCD_Send(0x13, DC_CMD); //1:48
 	LCD_Send(0x20, DC_CMD);	//使用基本命令
+	
 	LCD_Send(0x0C, DC_CMD); //设定显示模式，普通显示
 	//LCD_Send(0x0D, DC_CMD);	//设定显示模式，反转显示
 	LCD_Clear();
@@ -177,14 +180,17 @@ void LCD5110_Init(void)
 *******************************************************************************/
 void LCD_Send(u8 data, DCType dc)
 {
-  while( SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE ) == RESET );
+//	LCD_CE = 0;
+//  while( SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE ) == RESET );
 	if (dc==DC_CMD)
 		LCD_DC = 0;	//发送命令
 	else
 		LCD_DC = 1;//发送数据
-    SPI_I2S_SendData(SPI2, data);
-    //等待数据完成，否则LCD_SET_XY 会有问题
-    while( SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE ) == RESET );
+	SPI2_ReadWriteByte(data);
+//    SPI_I2S_SendData(SPI2, data);
+//    //等待数据完成，否则LCD_SET_XY 会有问题
+//    while( SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE ) == RESET );
+//	LCD_CE = 1;
 }
 
 /*******************************************************************************
@@ -246,7 +252,6 @@ void LCD_Clear(void)
 *******************************************************************************/
 void LCD_Write_Char(u8 ascii)
 {
-	
     u8 n;
 	LCD_CE = 0;
     ascii -= 32; //ASCII码-32
@@ -304,4 +309,14 @@ void LCD_Write_EnStr(u8 X, u8 Y, u8* s)
     }
     #endif
 		LCD_CE = 1;
+}
+
+void LCD_Printf(u8 x,u8 y,const char *fmt,...)
+{
+		va_list ap;  
+		char string[1024];//
+		va_start(ap,fmt);  
+		vsprintf(string,fmt,ap); 
+		LCD_Write_EnStr(x,y,(u8*)string);
+		va_end(ap);  
 }

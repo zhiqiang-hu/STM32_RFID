@@ -47,7 +47,7 @@ void TaskWriteAck(void);
 
 int main(void)
 {
-	u8 i;
+	u16 i;
 	volatile u8 read_sta=0;
 	u8 RFID_ID_CODE[4];
 	u8 RFID_DATA_BUF0[16] = {0};
@@ -56,12 +56,11 @@ int main(void)
 	USART1_Init(115200);
 	LED_Init();
 //	SPI_Flash_Init();
-	LCD_GPIO_Init();
 	RCC522_GPIO_Init();
+	RCC522_Init();
+	LCD_GPIO_Init();
 	LCD5110_Init();
 	
-//	LCD_Write_EnStr(0,0,"hello");
-	RCC522_Init();
 	Timer3_Init(49,7199);//7200·ÖÆµ£¬72000000/7200=10000  50 = 5ms
 //	if((0 == CheckProgFlag()))
 //	{
@@ -84,10 +83,13 @@ int main(void)
 	memset(RFID_DATA_BUF0,0,16);
 	while(1)
 	{
-		LCD_Clear();
+//		LCD_Clear();
 		RFID_Get_ID(RFID_ID_CODE);
 		read_sta = Read_Block(2,RFID_DATA_BUF0,(uint8_t *)RFID_PASSWORD_A);
-		LCD_Write_EnStr(0,0,"hello");
+		delay_us(50);
+		//LCD_Write_EnStr(0,0,"hello");
+		LCD_Printf(0,2,"id=%08X",*((unsigned int*)RFID_ID_CODE));
+		LCD_Printf(0,3,"count=%d",i++);
 		memset(RFID_ID_CODE,0,4);
 		memset(RFID_DATA_BUF0,0,16);
 		LED1 = !LED1;

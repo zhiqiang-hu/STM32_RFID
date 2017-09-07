@@ -83,7 +83,7 @@ char PcdReset(void)
 	SET_RC522RST;
 	delay_ns(10);
 	WriteRawRC(CommandReg,PCD_RESETPHASE);
-//	WriteRawRC(CommandReg,PCD_RESETPHASE);
+	WriteRawRC(CommandReg,PCD_RESETPHASE);
 	delay_ns(10);
 	WriteRawRC(ModeReg,0x3D);            //和Mifare卡通讯，CRC初始值0x6363
 	WriteRawRC(TReloadRegL,30);           
@@ -148,15 +148,15 @@ char M500PcdConfigISOType(u8   type)
 
 void RCC522_GPIO_Init(void)
 {
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB |RCC_APB2Periph_AFIO, ENABLE);
 	GPIOB->CRL&=0XFF0FFFFF; 	 
 	GPIOB->CRL|=0X00300000; 
-	GPIOB->CRL&=0XFFFFFF0F; 	 
-	GPIOB->CRL|=0X00000030; 
+	GPIOB->CRH&=0XFFFFFF0F; 	 
+	GPIOB->CRH|=0X00000030; 
 
 	GPIOB->CRH&=0X000FFFFF; 	 //PB.13 PB.14 PB.15
 	GPIOB->CRH|=0XB8B00000;
 	RFID_CS = 1;
-
 }
 
 void RCC522_Init(void)
